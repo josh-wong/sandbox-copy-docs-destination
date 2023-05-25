@@ -34,6 +34,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
+          git config --local user.email "joshuarwong@gmail.com"
           git config --local user.name "josh-wong"
           git add .
           git commit -m "Copy docs to product doc repository"
