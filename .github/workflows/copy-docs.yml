@@ -1,0 +1,40 @@
+name: Copy Docs
+
+on:
+  push:
+    branches:
+      - update-docs
+
+jobs:
+  copy_docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout destination repository
+        uses: actions/checkout@v2
+        with:
+          repository: josh-wong/sandbox-copy-docs-destination  # Replace with the destination repository details
+
+      - name: Copy docs from sandbox-copy-docs-source-1
+        uses: actions/checkout@v2
+        with:
+          repository: josh-wong/sandbox-copy-docs-source-1  # Replace with the first source repository details
+
+      - name: Copy docs from sandbox-copy-docs-source-2
+        uses: actions/checkout@v2
+        with:
+          repository: josh-wong/sandbox-copy-docs-source-2  # Replace with the second source repository details
+
+      # Add more steps for each repository you want to copy from
+
+      - name: Move sandbox-copy-docs-source-1 docs to destination
+        run: |
+          mkdir -p docs/new
+          cp -r docs docs/new
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.name "josh-wong"
+          git add .
+          git commit -m "Copy docs to product doc repository"
+          git push origin update-docs
