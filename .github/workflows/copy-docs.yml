@@ -38,4 +38,4 @@ jobs:
           git config --local user.name "josh-wong"
           git add .
           git commit -m "Copy docs to product doc repository"
-          git push origin update-docs
+          git push origin main
