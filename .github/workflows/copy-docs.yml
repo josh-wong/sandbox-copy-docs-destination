@@ -3,7 +3,7 @@ name: Copy Docs
 on:
   push:
     branches:
-      - update-docs
+      - main
 
 jobs:
   copy_docs:
