@@ -69,7 +69,7 @@ jobs:
           title: Copy docs from source repository
           body: |
             This pull request copies the contents of the "docs" folder
-            from multiple repositories.
+            from source repositories that have updated contents in their `docs` folders.
 
           base: main
           draft: false
