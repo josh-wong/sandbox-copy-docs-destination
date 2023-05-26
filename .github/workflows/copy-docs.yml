@@ -3,7 +3,7 @@ name: Copy Docs and Submit Pull Request
 on:
   schedule:
     # ATTENTION: To reduce GitHub Action usage, set cron to '0 0 3 * *' (at 12:00 AM on Tuesdays) when not inactive
-    - cron: '0,15,30,45 * * * *'  # Schedule the workflow to run every XX:00 and XX:30 ('0,30 * * * *')
+    - cron: '0 0 3 * *'  # Schedule the workflow to run every XX:00 and XX:30 ('0,30 * * * *')
 
 jobs:
   copy_docs_and_submit_pr:
