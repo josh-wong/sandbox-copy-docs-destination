@@ -31,7 +31,7 @@ jobs:
       - name: Check for Changes
         id: check_changes
         run: |
-          git diff --quiet HEAD -- docs
+          git diff --quiet HEAD^ HEAD -- docs
           echo ::set-output name=has_changes::!$?
 
       - name: Move Docs to Destination
@@ -70,5 +70,6 @@ jobs:
           body: |
             This pull request copies the contents of the "docs" folder
             from multiple repositories.
+
           base: main
           draft: false
