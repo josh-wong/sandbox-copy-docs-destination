@@ -10,18 +10,18 @@ jobs:
 
     steps:
       - name: Check Out Destination Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: josh-wong/sandbox-copy-docs-destination  # Replace with the destination repository details
 
       - name: Copy Docs from sandbox-copy-docs-source-1
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: josh-wong/sandbox-copy-docs-source-1  # Replace with the first source repository details
           ref: main  # Replace with the desired branch name
 
       - name: Copy Docs from sandbox-copy-docs-source-2
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: josh-wong/sandbox-copy-docs-source-2  # Replace with the second source repository details
           ref: main  # Replace with the desired branch name
@@ -32,7 +32,7 @@ jobs:
         id: check_changes
         run: |
           git diff --quiet HEAD^ HEAD -- docs
-          echo ::set-output name=has_changes::
+          echo ::set-output name=has_changes::!$?
 
       - name: Move Docs to Destination
         if: steps.check_changes.outputs.has_changes == 'true'
