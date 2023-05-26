@@ -32,7 +32,7 @@ jobs:
       - name: Check for Changes
         id: check_changes
         run: |
-          git diff --quiet HEAD^ HEAD -- docs
+          git diff --quiet HEAD -- docs
           echo "has_changes=!$?" >> $GITHUB_OUTPUT
 
       - name: Move Docs to Destination
