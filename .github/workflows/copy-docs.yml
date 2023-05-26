@@ -32,7 +32,7 @@ jobs:
         id: check_changes
         run: |
           git diff --quiet HEAD^ HEAD -- docs
-          echo ::set-output name=has_changes::!$?
+          echo ::set-output name=has_changes::
 
       - name: Move Docs to Destination
         if: steps.check_changes.outputs.has_changes == 'true'
