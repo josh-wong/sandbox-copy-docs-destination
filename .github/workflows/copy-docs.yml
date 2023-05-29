@@ -1,9 +1,12 @@
 name: Copy Docs and Submit Pull Request
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     # ATTENTION: To reduce GitHub Action usage, set cron to '0 0 3 * *' (at 12:00 AM on Tuesdays) when not inactive
-    - cron: '0 0 3 * *'  # Schedule the workflow to run every XX:00 and XX:30 ('0,30 * * * *')
+    - cron: '0,15,30,45 * * * *'  # Schedule the workflow to run every XX:00, XX:15, XX:30, and XX:45 ('0,15,30,45 * * * *')
 
 jobs:
   copy_docs_and_submit_pr:
@@ -12,34 +15,35 @@ jobs:
     steps:
       - name: Check Out Destination Repository
         uses: actions/checkout@v3
-        with:
-          repository: josh-wong/sandbox-copy-docs-destination  # Replace with the destination repository details
 
       - name: Copy Docs from sandbox-copy-docs-source-1
         uses: actions/checkout@v3
         with:
           repository: josh-wong/sandbox-copy-docs-source-1  # Replace with the first source repository details
+          path: sandbox-copy-docs-source-1  # Replace with the desired path to clone the repository
           ref: main  # Replace with the desired branch name
 
       - name: Copy Docs from sandbox-copy-docs-source-2
         uses: actions/checkout@v3
         with:
           repository: josh-wong/sandbox-copy-docs-source-2  # Replace with the second source repository details
+          path: sandbox-copy-docs-source-2  # Replace with the desired path to clone the repository
           ref: main  # Replace with the desired branch name
 
       # Add more steps for each repository you want to copy from
 
       - name: Check for Changes
         id: check_changes
+        # Set the echo output variable based on changes
         run: |
-          git diff --quiet HEAD -- docs
-          echo "has_changes=!$?" >> $GITHUB_OUTPUT
-
+          git diff --quiet HEAD^ HEAD -- sandbox-copy-docs-source-1/docs sandbox-copy-docs-source-2/docs
+          echo "has_changes=!$?" >> $GITHUB_OUTPUT  
+            
       - name: Move Docs to Destination
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
-          mkdir -p docs/new
-          cp -r docs docs/new
+          cp -r sandbox-copy-docs-source-1/docs sandbox-copy-docs-destination/docs  # Replace with the appropriate paths for each repository
+          cp -r sandbox-copy-docs-source-2/docs sandbox-copy-docs-destination/docs  # Replace with the appropriate paths for each repository
 
       - name: Configure Git
         if: steps.check_changes.outputs.has_changes == 'true'
@@ -52,7 +56,7 @@ jobs:
         run: |
           git checkout -b add-updated-docs
           git add .
-          git commit -m "Copy docs from source repository"
+          git commit -m "Copy docs from source repositories"
 
       - name: Push Branch
         if: steps.check_changes.outputs.has_changes == 'true'
@@ -67,10 +71,9 @@ jobs:
         with:
           token: ${{ secrets.COPY_DOCS_TOKEN }}
           branch: add-updated-docs
-          title: Copy docs from source repository
+          title: Copy docs from source repositories
           body: |
-            This pull request copies the contents of the "docs" folder
-            from source repositories that have updated contents in their `docs` folders.
+            This pull request copies the contents of the "docs" folder from source repositories that have updated contents in their `docs` folders.
 
           base: main
           draft: false
