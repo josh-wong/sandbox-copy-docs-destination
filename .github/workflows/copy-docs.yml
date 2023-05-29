@@ -5,8 +5,8 @@ on:
     branches:
       - main
   schedule:
-    # ATTENTION: To reduce GitHub Action usage, set cron to '0 0 3 * *' (at 12:00 AM on Tuesdays) when not inactive
-    - cron: '0,15,30,45 * * * *'  # Schedule the workflow to run every XX:00, XX:15, XX:30, and XX:45 ('0,15,30,45 * * * *')
+    # ATTENTION: To reduce GitHub Action usage, set cron to '0 0 1 * *' (at 12:00 AM on the 1st of the month) when not inactive
+    - cron: '0 0 1 * *'  # Schedule the workflow to run every XX:00, XX:15, XX:30, and XX:45 ('0,15,30,45 * * * *')
 
 jobs:
   copy_docs_and_submit_pr:
