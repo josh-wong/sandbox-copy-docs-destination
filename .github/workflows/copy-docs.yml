@@ -36,7 +36,7 @@ jobs:
         id: check_changes
         # Set the echo output variable based on changes
         run: |
-          git diff --quiet HEAD^ HEAD -- sandbox-copy-docs-source-1/docs sandbox-copy-docs-source-2/docs
+          git diff --quiet HEAD -- sandbox-copy-docs-source-1/docs sandbox-copy-docs-source-2/docs
           echo "has_changes=!$?" >> $GITHUB_OUTPUT  
             
       - name: Move Docs to Destination
