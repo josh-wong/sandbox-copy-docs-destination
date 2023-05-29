@@ -37,7 +37,7 @@ jobs:
         # Set the echo output variable based on changes
         run: |
           git diff --quiet HEAD -- sandbox-copy-docs-source-1/docs sandbox-copy-docs-source-2/docs
-          echo "has_changes=!$?" >> $GITHUB_OUTPUT  
+          echo "has_changes= " >> "$GITHUB_OUTPUT"
             
       - name: Move Docs to Destination
         if: steps.check_changes.outputs.has_changes == 'true'
