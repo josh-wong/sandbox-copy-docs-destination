@@ -1,77 +1,47 @@
-name: Copy Docs and Submit Pull Request
+name: Copy Docs Pull Request
 
 on:
-  push:
-    branches:
-      - main
   schedule:
-    # ATTENTION: To reduce GitHub Action usage, set cron to '0 0 1 * *' (at 12:00 AM on the 1st of the month) when not inactive
-    - cron: '0 0 1 * *'  # Schedule the workflow to run every XX:00, XX:15, XX:30, and XX:45 ('0,15,30,45 * * * *')
+    - cron: '0,15,30,45 * * * *'  # Schedule the workflow to run once a day
+  workflow_dispatch:
 
 jobs:
   copy_docs_and_submit_pr:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Out Destination Repository
+      - name: Checkout main repository
         uses: actions/checkout@v3
 
-      - name: Copy Docs from sandbox-copy-docs-source-1
-        uses: actions/checkout@v3
-        with:
-          repository: josh-wong/sandbox-copy-docs-source-1  # Replace with the first source repository details
-          path: sandbox-copy-docs-source-1  # Replace with the desired path to clone the repository
-          ref: main  # Replace with the desired branch name
+      - name: Setup Git
+        run: |
+          git config --global user.name "josh-wong"
+          git config --global user.email "joshuarwong@gmail.com"
 
-      - name: Copy Docs from sandbox-copy-docs-source-2
-        uses: actions/checkout@v3
-        with:
-          repository: josh-wong/sandbox-copy-docs-source-2  # Replace with the second source repository details
-          path: sandbox-copy-docs-source-2  # Replace with the desired path to clone the repository
-          ref: main  # Replace with the desired branch name
+      - name: Clone and Copy Docs from sandbox-copy-docs-source-1
+        run: |
+          git clone https://github.com/josh-wong/sandbox-copy-docs-source-1.git sandbox-copy-docs-source-1
+          cp -r sandbox-copy-docs-source-1/docs sandbox-copy-docs-destination/docs
+
+      - name: Clone and Copy Docs from sandbox-copy-docs-source-2
+        run: |
+          git clone https://github.com/josh-wong/sandbox-copy-docs-source-2.git sandbox-copy-docs-source-2
+          cp -r sandbox-copy-docs-source-2/docs sandbox-copy-docs-destination/docs
 
       # Add more steps for each repository you want to copy from
 
-      - name: Check for Changes
-        id: check_changes
-        # Set the echo output variable based on changes
+      - name: Commit and Push Changes
         run: |
-          git diff --quiet HEAD -- sandbox-copy-docs-source-1/docs sandbox-copy-docs-source-2/docs
-          echo "has_changes= " >> "$GITHUB_OUTPUT"
-            
-      - name: Move Docs to Destination
-        if: steps.check_changes.outputs.has_changes == 'true'
-        run: |
-          cp -r sandbox-copy-docs-source-1/docs sandbox-copy-docs-destination/docs
-          cp -r sandbox-copy-docs-source-2/docs sandbox-copy-docs-destination/docs
-
-      - name: Configure Git
-        if: steps.check_changes.outputs.has_changes == 'true'
-        run: |
-          git config --local user.email "joshuarwong@gmail.com"
-          git config --local user.name "josh-wong"
-
-      - name: Create Branch
-        if: steps.check_changes.outputs.has_changes == 'true'
-        run: |
-          git checkout -b add-updated-docs
+          cd sandbox-copy-docs-destination
           git add .
-          git commit -m "Copy docs from source repositories"
-
-      - name: Push Branch
-        if: steps.check_changes.outputs.has_changes == 'true'
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.COPY_DOCS_TOKEN }}
-          branch: add-updated-docs
+          git commit -m "Copy docs from multiple repositories"
+          git push origin main
 
       - name: Create Pull Request
-        if: steps.check_changes.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.COPY_DOCS_TOKEN }}
-          branch: add-updated-docs
-          title: Copy docs from source repositories
+          title: Copy docs from multiple repositories
           body: |
             This pull request copies the contents of the "docs" folder from source repositories that have updated contents in their `docs` folders.
 
