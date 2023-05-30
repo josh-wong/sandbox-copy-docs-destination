@@ -29,7 +29,7 @@ jobs:
       - name: Check for Changes
         id: check_changes
         run: |
-          diff=$(git diff --name-only sandbox-copy-docs-source-1/docs sandbox-copy-docs-source-2/docs)
+          diff=$(git diff sandbox-copy-docs-source-1/docs sandbox-copy-docs-source-2/docs)
           if [ -n "$diff" ]; then
             echo "::set-output name=has_changes::true"
           else
