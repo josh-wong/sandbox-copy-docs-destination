@@ -1,9 +1,12 @@
-name: Copy Docs Pull Request
+name: Copy Docs and Submit Pull Request
 
 on:
+  push:
+    branches:
+      - main
   schedule:
-    - cron: '0,15,30,45 * * * *'  # Schedule the workflow to run once a day
-  workflow_dispatch:
+    # ATTENTION: To reduce GitHub Action usage, set cron to '0 0 1 * *' (at 12:00 AM on the 1st of the month) when not inactive
+    - cron: '0,15,30,45 * * * *'  # Schedule the workflow to run every XX:00, XX:15, XX:30, and XX:45 ('0,15,30,45 * * * *')
 
 jobs:
   copy_docs_and_submit_pr:
@@ -13,34 +16,45 @@ jobs:
       - name: Checkout main repository
         uses: actions/checkout@v3
 
-      - name: Setup Git
+      - name: Set up Git credentials
         run: |
-          git config --global user.name "josh-wong"
           git config --global user.email "joshuarwong@gmail.com"
+          git config --global user.name "josh-wong"
 
-      - name: Clone and Copy Docs from sandbox-copy-docs-source-1
+      - name: Clone other repositories
         run: |
-          git clone https://github.com/josh-wong/sandbox-copy-docs-source-1.git sandbox-copy-docs-source-1
+          git clone --depth 1 --branch main https://github.com/josh-wong/sandbox-copy-docs-source-1 sandbox-copy-docs-source-1
+          git clone --depth 1 --branch main https://github.com/josh-wong/sandbox-copy-docs-source-2 sandbox-copy-docs-source-2
+
+      - name: Check for Changes
+        id: check_changes
+        run: |
+          diff=$(git diff --name-only sandbox-copy-docs-source-1/docs sandbox-copy-docs-source-2/docs)
+          if [ -n "$diff" ]; then
+            echo "::set-output name=has_changes::true"
+          else
+            echo "::set-output name=has_changes::false"
+          fi
+
+      - name: Move Docs to Main Repository
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
           cp -r sandbox-copy-docs-source-1/docs sandbox-copy-docs-destination/docs
-
-      - name: Clone and Copy Docs from sandbox-copy-docs-source-2
-        run: |
-          git clone https://github.com/josh-wong/sandbox-copy-docs-source-2.git sandbox-copy-docs-source-2
           cp -r sandbox-copy-docs-source-2/docs sandbox-copy-docs-destination/docs
 
-      # Add more steps for each repository you want to copy from
-
-      - name: Commit and Push Changes
+      - name: Commit Changes
+        if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           cd sandbox-copy-docs-destination
-          git add .
+          git add docs
           git commit -m "Copy docs from multiple repositories"
-          git push origin main
 
       - name: Create Pull Request
+        if: steps.check_changes.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v3
         with:
-          token: ${{ secrets.COPY_DOCS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: add-updated-docs
           title: Copy docs from multiple repositories
           body: |
             This pull request copies the contents of the "docs" folder from source repositories that have updated contents in their `docs` folders.
