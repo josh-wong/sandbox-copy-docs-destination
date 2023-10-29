@@ -19,7 +19,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.VALE }}
         with:
-          source_file: ".vale.ini, vale" # Vale configuration file to sync from
+          source_file: ".vale.ini" # Vale configuration file to sync from
           # source_file: "vale" # Vale style guide folder to sync from
           destination_repo: "josh-wong/sandbox-copy-docs-destination" # Target repo
           destination_folder: "./" # Folder to sync to
