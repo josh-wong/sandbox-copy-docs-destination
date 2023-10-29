@@ -1,0 +1,28 @@
+# Workflow needed to sync docs from the original repository to product docs repo
+name: 🔄 Sync docs from original repo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  copy-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Sync the contents of the "docs" folder to the product docs repo
+      - name: Push `sandbox-copy-docs-source-2` docs to folder
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.VALE }}
+        with:
+          source_file: "docs/" # Folder to sync from
+          destination_repo: "josh-wong/sandbox-copy-docs-destination" # Target repo
+          destination_folder: "sandbox-copy-docs-source-2" # Folder to sync to
+          destination_branch_create: "sandbox-copy-docs-source-2/update-vale-style-guide"
+          user_name: "josh-wong"
+          commit_message: "AUTO: Sync docs to docs repo"
+          use_rsync: rsync -avh
